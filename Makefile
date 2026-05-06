@@ -1,4 +1,4 @@
-NAME         = call_me_maybe
+NAME         = fly_in
 PYTHON       = python3
 UV           = uv
 SRC_DIR      = src
@@ -20,9 +20,9 @@ install:
 	@echo "$(GREEN)[ ٩(^‿^)۶ ] Everything is ready!$(RESET)"
 
 .PHONY: run
-run: install
+run:
 	@echo "$(BLUE)[ ᕕ( ᐛ )ᕗ ] Launching the generation engine...$(RESET)"
-	@$(UV) run python -m $(SRC_DIR)
+	@$(UV) run -m $(NAME)
 
 .PHONY: debug
 debug:

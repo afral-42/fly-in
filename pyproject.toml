@@ -12,3 +12,7 @@ dependencies = [
 
 [tool.ruff]
 line-length = 79
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
