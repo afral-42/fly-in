@@ -34,6 +34,8 @@ class ConfigParser:
                         continue
                     try:
                         content = content.split("#", 1)[0]
+                        if not content.strip():
+                            continue
                         key_str, value = content.split(":")
                     except ValueError:
                         raise ParsingError(
