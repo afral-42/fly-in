@@ -1,30 +1,28 @@
 import pyray as pr
 
+from fly_in.models.hub import HubModel
 
-class Hub:
+
+class HubView:
     def __init__(
         self,
-        position: pr.Vector3
     ) -> None:
-        self.position = position
-        self.radius = 2.0
+        pass
 
-    def render(self) -> None:
-        color = pr.RED
-
+    def render(self, hub: HubModel) -> None:
         pr.draw_cylinder(
-            self.position,
-            self.radius,
-            self.radius,
-            2,
-            8,
-            color
+            hub.position,
+            hub.radius,
+            hub.radius,
+            hub.height,
+            hub.slices,
+            hub.color
         )
         pr.draw_cylinder_wires(
-            self.position,
-            self.radius,
-            self.radius,
-            2,
-            8,
+            hub.position,
+            hub.radius,
+            hub.radius,
+            hub.height,
+            hub.slices,
             pr.BLACK
         )
