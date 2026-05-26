@@ -1,25 +1,33 @@
 import pyray as pr
 import os
 import math
+from collections import deque
+from fly_in.models.drone import DroneModel
 
 
-class Drone():
+class DroneView:
     def __init__(
         self,
         model: pr.Model,
-        start_point: pr.Vector3,
-        size: float = 0.20
     ) -> None:
         self.model = model
-        self.position = start_point
-        self.size = size
-    
-    def render(self) -> None:
+
+    def render(self, drone: DroneModel) -> None:
+        rotation_axis = pr.Vector3(0, 1, 0)
+
         game_time = pr.get_time()
         animation_offset = math.sin(game_time * 3.0) * 0.5
         self.animated_position = pr.Vector3(
-            self.position.x,
-            self.position.y + animation_offset,
-            self.position.z
+            drone.position.x,
+            drone.position.y + animation_offset,
+            drone.position.z
         )
-        pr.draw_model(self.model, self.animated_position, self.size, pr.WHITE)
+
+        pr.draw_model_ex(
+            self.model,
+            self.animated_position,
+            rotation_axis,
+            drone.angle,
+            drone.size,
+            pr.WHITE
+        )
