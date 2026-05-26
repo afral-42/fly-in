@@ -10,18 +10,9 @@ class ZoneType(Enum):
     BLOCKED = "blocked"
 
 
-class Color(Enum):
-    GRAY  = "gray"
-    BLUE  = "blue"
-    RED   = "red"
-    GREEN = "green"
-    YELLOW = "yellow"
-    ORANGE = "orange"
-
-
 class ZoneMetadatas(BaseModel):
     zone: ZoneType = ZoneType.NORMAL
-    color: Color = Color.GRAY
+    color: str
     max_drones: Annotated[int, Field(gt=0)] = 1
 
     model_config = ConfigDict(extra='forbid')
