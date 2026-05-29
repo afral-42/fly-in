@@ -39,7 +39,8 @@ def build_world(config: FlyinConfig) -> WorldModel:
         model.add_text(
             str(hub.metadatas.max_drones),
             pr.Vector3(hub.x * SCALE, 2.1, hub.y * SCALE),
-            3.0
+            3.0,
+            get_pr_color(hub.metadatas.color)
         )
     
     for connection in config.connections:
@@ -83,7 +84,7 @@ def main() -> None:
 
     try:
         pr.set_config_flags(pr.ConfigFlags.FLAG_MSAA_4X_HINT)
-        pr.init_window(1920, 1080, "Fly-in")
+        pr.init_window(1080, 720, "Fly-in")
         pr.set_target_fps(60)
 
         # model = WorldModel()
