@@ -8,6 +8,7 @@ from fly_in.view.camera import Camera
 from fly_in.view.connection import ConnectionView
 from fly_in.view.drone import DroneView
 from fly_in.view.hub import HubView
+from fly_in.view.text import TextView
 
 
 class WorldView:
@@ -24,14 +25,18 @@ class WorldView:
 
         package_dir = Path(__file__).resolve().parent.parent
         self.model_path = str(package_dir / "assets" / "dji_spark.glb")
+        self.font_path = str(package_dir / "assets" / "superstar_memesbruh03.ttf")
 
     def __enter__(self) -> Self:
         self.drone_model = pr.load_model(self.model_path)
         self.drone_view = DroneView(
             self.drone_model
         )
+        self.font_model = pr.load_font_ex(self.font_path, 96, None, 0)
         self.hub_view = HubView()
         self.connection_view = ConnectionView()
+        self.text_view = TextView(self.font_model)
+
         return self
 
     def __exit__(
@@ -64,9 +69,9 @@ class WorldView:
         
     def render(self, world: WorldModel) -> None:
         pr.begin_drawing()
-        pr.clear_background(pr.WHITE)
+        back_color = pr.Color(251, 240, 233, 255)
+        pr.clear_background(back_color)   
         self.camera.begin_3d()
-
         for drone in world.drones:
             self.drone_view.render(drone)
 
@@ -75,6 +80,9 @@ class WorldView:
         
         for connection in world.connections:
             self.connection_view.render(connection)
+
+        for text in world.texts:
+            self.text_view.render(text)
 
         self.camera.end_3d()
         pr.end_drawing()

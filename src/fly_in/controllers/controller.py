@@ -15,5 +15,8 @@ class WorldController:
 
     def loop(self):
         while not pr.window_should_close():
+            if pr.is_key_pressed(pr.KEY_SPACE):
+                self.model.start_animation()
+
             self.model.update_state()
             self.view.render(self.model)
