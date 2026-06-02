@@ -7,8 +7,40 @@ from fly_in.parsing import ConfigParser, ParsingError
 import pyray as pr
 
 from fly_in.schemas import FlyinConfig
+from fly_in.services.dijkstra import Position, ReservedDijkstra
 from fly_in.view.world import WorldView
 
+
+def build_graph(config: FlyinConfig) -> dict:
+    # 1. On crée un dictionnaire rapide pour retrouver les Positions grâce au nom du hub
+    # (On inclut bien tous les hubs, y compris start et end pour être sûr)
+    all_hubs = config.hubs + [config.start_hub, config.end_hub]
+    positions_by_name = {
+        hub.name: Position(hub.x, hub.y, hub.name) 
+        for hub in all_hubs
+    }
+
+    # 2. On initialise le graphe avec des listes vides pour chaque Position
+    graph = {pos: [] for pos in positions_by_name.values()}
+
+    # 3. On lit les connexions et on branche les tuyaux !
+    for connection in config.connections:
+        if connection.start_name in positions_by_name and connection.end_name in positions_by_name:
+            start_pos = positions_by_name[connection.start_name]
+            end_pos = positions_by_name[connection.end_name]
+            
+            # On ajoute le voisin à la liste du hub de départ
+            graph[start_pos].append(end_pos)
+            graph[end_pos].append(start_pos)
+
+    return graph
+
+def build_restrictions(graph: dict, config: FlyinConfig) -> dict:
+    restrictions = {}
+    for hub in config.hubs:
+        restrictions[Position(hub.x, hub.y, hub.name)] = hub.metadatas.max_drones
+    
+    return restrictions
 
 
 def get_pr_color(color: str) -> pr.Color:
@@ -49,26 +81,28 @@ def build_world(config: FlyinConfig) -> WorldModel:
             connection.end_name
         )
 
+    # Test de notre djikstra
+    dijkstra = ReservedDijkstra(
+        build_graph(config),
+        Position(config.start_hub.x, config.start_hub.y, config.start_hub.name),
+        Position(config.end_hub.x, config.end_hub.y, config.end_hub.name),
+        build_restrictions(build_graph(config), config),
+        {}
+    )
 
     for i in range(config.nb_drones):
-        # 1. On choisit une taille de parcours aléatoire (au moins 1 hub, au maximum tous)
-        # Tu peux changer le '1' si tu veux qu'ils fassent des trajets plus longs minimum
-        nb_hubs_to_visit = random.randint(1, len(config.hubs))
+        path = []
+        solved = dijkstra.solve()
+        if solved is None:
+            raise Exception
+        for position in solved:
+            path.append(pr.Vector3(position.x * SCALE, 0, position.y * SCALE))
 
-        # 2. On tire au sort des INDEX, et on les TRIE pour respecter l'ordre original
-        random_indices = sorted(random.sample(range(len(config.hubs)), nb_hubs_to_visit))
-
-        # 3. On construit la 'deque' uniquement avec les hubs correspondants à ces index
-        random_path = deque([
-            pr.Vector3(config.hubs[idx].x * SCALE, 0, config.hubs[idx].y * SCALE) 
-            for idx in random_indices
-        ])
-
-        # 4. On ajoute le drone avec son chemin personnalisé
         model.add_drone(
-            random_path,
+            deque(path),
             pr.Vector3(config.start_hub.x * SCALE, 3, config.start_hub.y * SCALE),
         )
+        dijkstra.reset()
 
     return model
 
