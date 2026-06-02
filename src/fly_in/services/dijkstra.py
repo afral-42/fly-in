@@ -28,16 +28,24 @@ class ReservedDijkstra:
         hub_restrictions: dict[Position, int],
         connection_restrictions: dict[tuple[str, str], int]
     ) -> None:
-        self.connection_reservation: dict[tuple[str, str], int] = {}
+        self.connection_reservation: dict[tuple[tuple[str, str], int], int] = {}
         self.hub_reservation: dict[tuple[Position, int], int] = {}
         self.costs: list[tuple[int, Position]] = []
         self.graph = graph
         self.hub_restrictions = hub_restrictions
-        self.connection_restrictions = connection_restrictions
+        self.connection_restrictions = {
+            self.normalize_connection(connection): limit
+            for connection, limit in connection_restrictions.items()
+        }
         self.path: dict[Position, Position] = {}
         self.came_from: dict[tuple[Position, int], Position] = {}
         self.start = start
         self.end = end
+
+    @staticmethod
+    def normalize_connection(connection: tuple[str, str]) -> tuple[str, str]:
+        return min(connection), max(connection)
+
 
     def is_full(self, position: Position, turn: int) -> bool:
         reserved = self.hub_reservation.get((position, turn))
@@ -48,12 +56,24 @@ class ReservedDijkstra:
 
         return reserved >= restriction
 
+    def is_full_connection(self, position: Position, next: Position, turn: int) -> bool:
+        connection = self.normalize_connection((position.hub_name, next.hub_name))
+        reserved = self.connection_reservation.get((connection, turn))
+        restriction = self.connection_restrictions.get(connection)
+
+        if reserved is None or restriction is None:
+            return False
+
+        return reserved >= restriction
+
+
     def push_neighbors(self, position: Position, cost: int) -> None:
         next_turn = cost + 1
 
         for next in self.graph[position]:
             if (
                 not self.is_full(next, next_turn) and
+                not self.is_full_connection(position, next, next_turn) and
                 (next, next_turn) not in self.came_from
             ):
                 heapq.heappush(self.costs, (next_turn, next))
@@ -66,19 +86,8 @@ class ReservedDijkstra:
             heapq.heappush(self.costs, (next_turn, position))
             self.came_from[(position, next_turn)] = position
 
-
-    def debug_reservations(self) -> None:
-        print("=======    Liste des réservations   =======")
-        print("\n")
-        for (position, t), total in self.hub_reservation.items():
-            print(f"Position: {position.hub_name}")
-            print(f"Temps: {t}")
-            print(f"Total: {total}\n")
-
-
     def solve(self) -> list[Position] | None:
         heapq.heappush(self.costs, (0, self.start))
-        print(self.debug_reservations())
 
         while len(self.costs):
             cost, pos = heapq.heappop(self.costs)
@@ -88,11 +97,18 @@ class ReservedDijkstra:
             self.push_neighbors(pos, cost)
 
     def add_reservations(self, path: list[Position]) -> None:
+        for i in range(0, len(path) - 1):
+            prev, next = path[i].hub_name, path[i + 1].hub_name
+            connection = self.normalize_connection((prev, next))
+            if (connection, i) not in self.connection_reservation:
+                self.connection_reservation[(connection, i)] = 0
+            self.connection_reservation[(connection, i)] += 1
+
         for i, pos in enumerate(path, 1):
-            if not (pos, i) in self.hub_reservation:
+            if (pos, i) not in self.hub_reservation:
                 self.hub_reservation[(pos, i)] = 0
-            print(f"Réservation ajoutée pour la position {pos.hub_name}, à l'instant t={i}")
             self.hub_reservation[(pos, i)] += 1
+
 
     def reset(self) -> None:
         self.costs = []
