@@ -62,7 +62,7 @@ class WorldView:
 
         map_size = max(max_x - min_x, max_y - min_y)
         
-        camera_height = map_size * 0.8
+        camera_height = map_size * 0.8 
         camera_distance = map_size * 0.8
         self.camera.camera.target = pr.Vector3(target_x, 0.0, target_z)
         self.camera.camera.position = pr.Vector3(target_x, camera_height, target_z + camera_distance)

@@ -42,6 +42,15 @@ def build_restrictions(graph: dict, config: FlyinConfig) -> dict:
     
     return restrictions
 
+def build_connections(config: FlyinConfig) -> dict:
+    restrictions = {}
+    for connection in config.connections:
+        restrictions[
+            (connection.start_name, connection.end_name)
+        ] = connection.metadatas.max_link_capacity
+
+    return restrictions
+
 
 def get_pr_color(color: str) -> pr.Color:
     return getattr(pr, color.upper())
@@ -74,11 +83,24 @@ def build_world(config: FlyinConfig) -> WorldModel:
             3.0,
             get_pr_color(hub.metadatas.color)
         )
-    
+
+    all_hubs = config.hubs + [config.start_hub, config.end_hub]
+    hubs_by_name = {hub.name: hub for hub in all_hubs}
     for connection in config.connections:
         model.add_connection(
             connection.start_name,
             connection.end_name
+        )
+        start_hub = hubs_by_name[connection.start_name]
+        end_hub = hubs_by_name[connection.end_name]
+
+        model.add_text(
+            str(connection.metadatas.max_link_capacity),
+            pr.Vector3(((start_hub.x + end_hub.x) / 2) * SCALE, 1.5, ((start_hub.y + end_hub.y) / 2) * SCALE),
+            3.0,
+            pr.BLACK,
+            pr.WHITE,
+
         )
 
     # Test de notre djikstra
@@ -87,7 +109,7 @@ def build_world(config: FlyinConfig) -> WorldModel:
         Position(config.start_hub.x, config.start_hub.y, config.start_hub.name),
         Position(config.end_hub.x, config.end_hub.y, config.end_hub.name),
         build_restrictions(build_graph(config), config),
-        {}
+        build_connections(config)
     )
 
     for i in range(config.nb_drones):

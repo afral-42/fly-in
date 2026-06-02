@@ -23,9 +23,10 @@ class TextView:
             text_model.text,
             96,
             0,
-            pr.BLACK
+            text_model.color
         )
-        pr.image_alpha_clear(img, text_model.background_color, 0.1)
+        if text_model.background_color:
+            pr.image_alpha_clear(img, text_model.background_color, 0.1)
 
         texture = pr.load_texture_from_image(img)
         aspect_ratio = img.width / img.height

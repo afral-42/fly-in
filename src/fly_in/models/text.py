@@ -5,9 +5,9 @@ class TextModel:
         self,
         text: str,
         position: pr.Vector3,
-        background_color: pr.Color,
+        background_color: pr.Color | None = None,
         size: float = 4.0,
-        color: pr.Color = pr.DARKGRAY,
+        color: pr.Color = pr.BLACK,
     ) -> None:
         self.text = text
         self.position = position

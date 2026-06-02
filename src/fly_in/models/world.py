@@ -62,10 +62,20 @@ class WorldModel:
         except KeyError as e:
             raise WorldError(f"invalid hub name {e}")
 
-    def add_text(self, text: str, position: pr.Vector3, size: float, background_color: pr.Color) -> None:
-        self.texts.append(TextModel(text, position, background_color, size))
+    def add_text(
+        self,
+        text: str,
+        position: pr.Vector3,
+        size: float,
+        background_color: pr.Color | None = None,
+        color: pr.Color = pr.BLACK
+    ) -> None:
+        self.texts.append(TextModel(text, position, background_color, size, color))
 
     def start_animation(self) -> None:
+        if not all([drone.state == DroneState.PARKED for drone in self.drones]):
+            return
+
         for drone in self.drones:
             drone.prepare_takeoff()
 
