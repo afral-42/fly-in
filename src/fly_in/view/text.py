@@ -32,7 +32,6 @@ class TextView:
             )
             return
 
-
         img = pr.image_text_ex(
             self.model, text_model.text, 96, 0, text_model.color
         )
