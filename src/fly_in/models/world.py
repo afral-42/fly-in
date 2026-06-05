@@ -77,6 +77,14 @@ class WorldModel:
         for drone in self.drones:
             drone.prepare_takeoff()
 
+    def increase_speed(self) -> None:
+        for drone in self.drones:
+            drone.speed *= 1.2
+
+    def decrease_speed(self) -> None:
+        for drone in self.drones:
+            drone.speed *= 0.8
+
     def discard_drones(
         self, positions: dict[tuple[float, float], list[DroneModel]]
     ) -> None:
