@@ -5,6 +5,7 @@ import pyray as pr
 
 
 from fly_in.models.drone import DroneModel, DroneState
+from fly_in.models.hud_text import HudText
 from fly_in.models.text import TextModel
 from fly_in.models.hub import HubModel
 from fly_in.models.connection import ConnectionModel
@@ -20,6 +21,8 @@ class WorldModel:
         self.hubs: dict[str, HubModel] = {}
         self.connections: list[ConnectionModel] = []
         self.texts: list[TextModel] = []
+        self.hud_texts: list[HudText] = []
+        self.count = 0
 
     def _copy_vector(self, vector: pr.Vector3) -> pr.Vector3:
         return pr.Vector3(vector.x, vector.y, vector.z)
@@ -65,6 +68,19 @@ class WorldModel:
         color: pr.Color = pr.BLACK,
     ) -> None:
         self.texts.append(
+            TextModel(text, position, background_color, size, color)
+        )
+
+
+    def add_hud_text(
+        self,
+        text: str,
+        position: pr.Vector3,
+        size: float = 0.0,
+        background_color: pr.Color | None = None,
+        color: pr.Color = pr.BLACK,
+    ) -> None:
+        self.hud_texts.append(
             TextModel(text, position, background_color, size, color)
         )
 

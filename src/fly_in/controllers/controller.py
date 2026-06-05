@@ -37,10 +37,10 @@ class WorldController:
             if move_z != 0.0 or move_q != 0.0:
                 self.view.move_camera_zqsd(move_z, move_q)
 
-            if pr.is_key_pressed(pr.KeyboardKey.KEY_RIGHT):
+            if pr.is_key_pressed(pr.KeyboardKey.KEY_UP):
                 self.model.increase_speed()
 
-            if pr.is_key_pressed(pr.KeyboardKey.KEY_LEFT):
+            if pr.is_key_pressed(pr.KeyboardKey.KEY_DOWN):
                 self.model.decrease_speed()
 
             self.model.update_state()

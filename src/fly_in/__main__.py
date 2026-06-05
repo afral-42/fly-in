@@ -165,7 +165,7 @@ def build_world(config: FlyinConfig) -> WorldModel:
         solved = dijkstra.solve()
 
         if solved is None:
-            raise Exception
+            raise Exception("Path not found")
         for position in solved:
             path.append(pr.Vector3(position.x * SCALE, 0, position.y * SCALE))
 
@@ -182,14 +182,11 @@ def build_world(config: FlyinConfig) -> WorldModel:
 
 def main() -> None:
     try:
-        parser = ConfigParser("maps/challenger/01_the_impossible_dream.txt")
+        parser = ConfigParser("maps/easy/02_simple_fork.txt")
         config = parser.parse()
 
         print(config.model_dump_json(indent=4))
-    except ParsingError as e:
-        print(e)
 
-    try:
         pr.set_config_flags(pr.ConfigFlags.FLAG_MSAA_4X_HINT)
         pr.init_window(2080, 1280, "Fly-in")
         pr.set_target_fps(60)
@@ -209,6 +206,8 @@ def main() -> None:
             controller = WorldController(view, model)
             controller.loop()
 
+    except ParsingError as e:
+        print(e)
     except Exception as e:
         print(e)
     except KeyboardInterrupt:
