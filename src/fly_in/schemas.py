@@ -1,6 +1,7 @@
-from pydantic import BaseModel, model_validator, Field, ConfigDict
 from enum import Enum
 from typing import Annotated, Any, Self
+
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class ZoneType(Enum):
@@ -15,13 +16,13 @@ class ZoneMetadatas(BaseModel):
     color: str = "white"
     max_drones: Annotated[int, Field(gt=0)] = 1
 
-    model_config = ConfigDict(extra='forbid')
+    model_config = ConfigDict(extra="forbid")
 
 
 class ConnectionMetadatas(BaseModel):
     max_link_capacity: Annotated[int, Field(gt=0)] = 1
 
-    model_config = ConfigDict(extra='forbid')
+    model_config = ConfigDict(extra="forbid")
 
 
 class Zone(BaseModel):
@@ -36,7 +37,7 @@ class Connection(BaseModel):
     end_name: str
     metadatas: ConnectionMetadatas
 
-    @model_validator(mode='after')
+    @model_validator(mode="after")
     def validate_model(self) -> Self:
         if self.end_name == self.start_name:
             raise ValueError("End hub musts be different than start hub")
@@ -50,47 +51,52 @@ class FlyinConfig(BaseModel):
     hubs: list[Zone]
     connections: list[Connection]
 
-    @model_validator(mode='before')
+    @model_validator(mode="before")
     @classmethod
     def inject_default_capacity(cls, data: Any) -> Any:
         if isinstance(data, dict):
-            nb_drones = data.get('nb_drones')
+            nb_drones = data.get("nb_drones")
             if nb_drones is not None:
-                for hub_key in ('start_hub', 'end_hub'):
+                for hub_key in ("start_hub", "end_hub"):
                     hub = data.get(hub_key)
                     if isinstance(hub, dict):
-                        metadatas = hub.get('metadatas')
+                        metadatas = hub.get("metadatas")
                         if metadatas is None:
                             metadatas = {}
-                            hub['metadatas'] = metadatas
+                            hub["metadatas"] = metadatas
 
-                        if isinstance(metadatas, dict) and 'max_drones' not in metadatas:
-                            metadatas['max_drones'] = nb_drones
+                        if (
+                            isinstance(metadatas, dict)
+                            and "max_drones" not in metadatas
+                        ):
+                            metadatas["max_drones"] = nb_drones
         return data
 
-    @model_validator(mode='after')
+    @model_validator(mode="after")
     def validate_unique_connections(self) -> Self:
         seen_connections = set()
-        
+
         for conn in self.connections:
             normalized_conn = tuple(sorted([conn.start_name, conn.end_name]))
-            
+
             if normalized_conn in seen_connections:
                 raise ValueError(
-                    f"Duplicate connection detected: {conn.start_name}-{conn.end_name}"
+                    "Duplicate connection detected: "
+                    f"{conn.start_name}-{conn.end_name}"
                 )
-            
+
             seen_connections.add(normalized_conn)
-            
+
         return self
 
-    @model_validator(mode='after')
+    @model_validator(mode="after")
     def validate_model(self) -> Self:
         if (
-            self.start_hub.metadatas.max_drones < self.nb_drones or
-            self.end_hub.metadatas.max_drones < self.nb_drones
+            self.start_hub.metadatas.max_drones < self.nb_drones
+            or self.end_hub.metadatas.max_drones < self.nb_drones
         ):
             raise ValueError(
-                f"Start hub and end hub can't have less than {self.nb_drones} drones"
+                "Start hub and end hub can't have less than "
+                f"{self.nb_drones} drones"
             )
         return self

@@ -16,7 +16,7 @@ class HubView:
             hub.radius,
             hub.height,
             hub.slices,
-            hub.color
+            hub.color,
         )
         pr.draw_cylinder_wires(
             hub.position,
@@ -24,5 +24,5 @@ class HubView:
             hub.radius,
             hub.height,
             hub.slices,
-            pr.BLACK
+            pr.BLACK,
         )

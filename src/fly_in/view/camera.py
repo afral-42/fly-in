@@ -8,7 +8,7 @@ class Camera:
         fov: float,
         projection: pr.CameraProjection,
         target: pr.Vector3,
-        position: pr.Vector3
+        position: pr.Vector3,
     ) -> None:
         self.camera = pr.Camera3D()
         self.camera.up = up
@@ -25,6 +25,6 @@ class Camera:
 
     def begin_3d(self) -> None:
         pr.begin_mode_3d(self.camera)
-    
+
     def end_3d(self) -> None:
         pr.end_mode_3d()

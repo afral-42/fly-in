@@ -14,24 +14,24 @@ class WorldController:
         self.model = model
         self.animation = False
 
-    def loop(self):
+    def loop(self) -> None:
         while not pr.window_should_close():
-            if pr.is_key_pressed(pr.KEY_SPACE):
+            if pr.is_key_pressed(pr.KeyboardKey.KEY_SPACE):
                 self.animation = not self.animation
 
-            if self.animation or pr.is_key_pressed(pr.KEY_RIGHT):
+            if self.animation or pr.is_key_pressed(pr.KeyboardKey.KEY_RIGHT):
                 self.model.start_animation()
 
             move_z = 0.0
             move_q = 0.0
 
-            if pr.is_key_down(pr.KEY_W):
+            if pr.is_key_down(pr.KeyboardKey.KEY_W):
                 move_z += 1.0
-            if pr.is_key_down(pr.KEY_S):
+            if pr.is_key_down(pr.KeyboardKey.KEY_S):
                 move_z -= 1.0
-            if pr.is_key_down(pr.KEY_A):
+            if pr.is_key_down(pr.KeyboardKey.KEY_A):
                 move_q -= 1.0
-            if pr.is_key_down(pr.KEY_D):
+            if pr.is_key_down(pr.KeyboardKey.KEY_D):
                 move_q += 1.0
 
             if move_z != 0.0 or move_q != 0.0:

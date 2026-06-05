@@ -1,5 +1,6 @@
 import pyray as pr
 
+
 class TextModel:
     def __init__(
         self,

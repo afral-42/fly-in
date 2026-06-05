@@ -10,7 +10,7 @@ class HubModel:
         max_drones: int | None = None,
         radius: float = 4,
         height: float = 2,
-        slices: int = 8
+        slices: int = 8,
     ) -> None:
         self.position = position
         self.radius = radius

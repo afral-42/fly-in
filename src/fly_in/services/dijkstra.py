@@ -131,6 +131,8 @@ class ReservedDijkstra:
 
             self.push_neighbors(pos, cost)
 
+        return None
+
     def add_reservations(self, path: list[Position]) -> None:
         path.insert(0, self.start)
         for i, pos in enumerate(path, 0):

@@ -1,4 +1,5 @@
 from collections import deque
+from typing import cast
 
 import pyray as pr
 
@@ -10,7 +11,7 @@ from fly_in.services.dijkstra import Position, ReservedDijkstra
 from fly_in.view.world import WorldView
 
 
-def build_graph(config: FlyinConfig) -> dict:
+def build_graph(config: FlyinConfig) -> dict[Position, list[Position]]:
     all_hubs = config.hubs + [config.start_hub, config.end_hub]
     positions_by_name = {
         hub.name: Position(
@@ -24,7 +25,9 @@ def build_graph(config: FlyinConfig) -> dict:
         for hub in all_hubs
     }
 
-    graph = {pos: [] for pos in positions_by_name.values()}
+    graph: dict[Position, list[Position]] = {
+        pos: [] for pos in positions_by_name.values()
+    }
 
     for connection in config.connections:
         if (
@@ -94,7 +97,7 @@ def build_connections(config: FlyinConfig) -> dict:
 
 
 def get_pr_color(color: str) -> pr.Color:
-    return getattr(pr, color.upper())
+    return cast(pr.Color, getattr(pr, color.upper()))
 
 
 def build_world(config: FlyinConfig) -> WorldModel:
