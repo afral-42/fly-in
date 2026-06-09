@@ -62,6 +62,7 @@ class WorldView:
     ) -> None:
         """Context manager exit: release loaded model resources."""
         pr.unload_model(self.drone_model)
+        pr.unload_font(self.font_model)
 
     def center_camera(self, world_model: WorldModel) -> None:
         """Center camera to focus on the extent of `world_model`.
