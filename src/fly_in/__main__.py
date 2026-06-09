@@ -5,8 +5,8 @@ import pyray as pr
 
 from fly_in.controllers.controller import WorldController
 from fly_in.models.world import WorldModel
-from fly_in.parsing import ConfigParser, ParsingError
-from fly_in.schemas import FlyinConfig, ZoneType
+from fly_in.parsing.parsing import ConfigParser, ParsingError
+from fly_in.parsing.schemas import FlyinConfig, ZoneType
 from fly_in.services.dijkstra import Position, ReservedDijkstra
 from fly_in.view.world import WorldView
 
@@ -150,7 +150,7 @@ def build_world(config: FlyinConfig) -> WorldModel:
             pr.BLACK,
         )
 
-    dijkstra = ReservedDijkstra(
+    algo = ReservedDijkstra(
         build_graph(config),
         Position(
             config.start_hub.x, config.start_hub.y, config.start_hub.name
@@ -160,14 +160,18 @@ def build_world(config: FlyinConfig) -> WorldModel:
         build_connections(config),
     )
 
+    count = 0
     for i in range(config.nb_drones):
         path = []
-        solved = dijkstra.solve()
+        solved = algo.solve()
 
         if solved is None:
-            raise Exception("Path not found")
+            raise Exception("Path not found, please retry with a valid map")
         for position in solved:
             path.append(pr.Vector3(position.x * SCALE, 0, position.y * SCALE))
+
+        if len(path) > count:
+            count = len(path)
 
         model.add_drone(
             deque(path),
@@ -175,29 +179,25 @@ def build_world(config: FlyinConfig) -> WorldModel:
                 config.start_hub.x * SCALE, 3, config.start_hub.y * SCALE
             ),
         )
-        dijkstra.reset()
+        algo.reset()
+
+    model.add_hud_text(
+        f"Total cost: {count}", 10, 30, 30, pr.BLACK
+    )
 
     return model
 
 
 def main() -> None:
     try:
-        parser = ConfigParser("maps/easy/02_simple_fork.txt")
+        parser = ConfigParser("maps/hard/01_maze_nightmare.txt")
         config = parser.parse()
 
         print(config.model_dump_json(indent=4))
 
         pr.set_config_flags(pr.ConfigFlags.FLAG_MSAA_4X_HINT)
-        pr.init_window(2080, 1280, "Fly-in")
+        pr.init_window(1080, 720, "Fly-in")
         pr.set_target_fps(60)
-
-        # model = WorldModel()
-        # build_world(config)
-        # model.add_hub("start", pr.RED, pr.Vector3(0.0, 0.0, 0.0))
-        # model.add_hub("1", pr.BLUE, pr.Vector3(0.0, 0.0, 20.0))
-        # model.add_hub("end", pr.GOLD, pr.Vector3(20.0, 0.0, 20.0))
-        # model.add_drone(pr.Vector3(0.0, 2.0, 0.0))
-        # model.add_connection("start", "end")
 
         model = build_world(config)
 

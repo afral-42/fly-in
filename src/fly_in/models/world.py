@@ -5,7 +5,7 @@ import pyray as pr
 
 
 from fly_in.models.drone import DroneModel, DroneState
-from fly_in.models.hud_text import HudText
+from fly_in.models.hud_text import HudTextModel
 from fly_in.models.text import TextModel
 from fly_in.models.hub import HubModel
 from fly_in.models.connection import ConnectionModel
@@ -21,13 +21,12 @@ class WorldModel:
         self.hubs: dict[str, HubModel] = {}
         self.connections: list[ConnectionModel] = []
         self.texts: list[TextModel] = []
-        self.hud_texts: list[HudText] = []
+        self.hud_texts: list[HudTextModel] = []
         self.count = 0
 
     def _copy_vector(self, vector: pr.Vector3) -> pr.Vector3:
         return pr.Vector3(vector.x, vector.y, vector.z)
 
-    # TODO: prendre en parametre la liste des path
     def add_drone(
         self,
         hubs_path: deque[pr.Vector3],
@@ -71,17 +70,16 @@ class WorldModel:
             TextModel(text, position, background_color, size, color)
         )
 
-
     def add_hud_text(
         self,
         text: str,
-        position: pr.Vector3,
-        size: float = 0.0,
-        background_color: pr.Color | None = None,
+        position_x: int,
+        position_y: int,
+        size: int = 0,
         color: pr.Color = pr.BLACK,
     ) -> None:
         self.hud_texts.append(
-            TextModel(text, position, background_color, size, color)
+            HudTextModel(text, position_x, position_y, size, color)
         )
 
     def start_animation(self) -> None:

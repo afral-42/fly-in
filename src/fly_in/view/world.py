@@ -10,6 +10,7 @@ from fly_in.view.camera import Camera
 from fly_in.view.connection import ConnectionView
 from fly_in.view.drone import DroneView
 from fly_in.view.hub import HubView
+from fly_in.view.hud_text import HudTextView
 from fly_in.view.text import TextView
 
 
@@ -38,6 +39,7 @@ class WorldView:
         self.hub_view = HubView()
         self.connection_view = ConnectionView()
         self.text_view = TextView(self.font_model)
+        self.hud_text_view = HudTextView()
 
         return self
 
@@ -122,4 +124,8 @@ class WorldView:
             self.text_view.render(text)
 
         self.camera.end_3d()
+
+        for hud_text in world.hud_texts:
+            self.hud_text_view.render(hud_text)
+
         pr.end_drawing()

@@ -3,7 +3,7 @@ from collections.abc import Iterator
 from enum import Enum
 from typing import cast
 
-from fly_in.schemas import FlyinConfig
+from fly_in.parsing.schemas import FlyinConfig
 
 
 class ParsingError(Exception):
