@@ -300,6 +300,6 @@ The subject demands strict performance targets. The algorithm must route the fle
 * [Pydantic Validation](https://www.google.com/search?q=https://docs.pydantic.dev/latest/) — For creating bulletproof parsers and schemas.
 
 
-* **AI Usage:** * *Gemini* was used only to brainstorm, agregate documentations and while understanding hard concepts such as graph temporality, 3d vectors transformations... 
+* **AI Usage:** *Gemini* was used only to brainstorm, agregate documentations and while understanding hard concepts such as graph temporality, 3d vectors transformations... 
 
 *All code has been written by human for human.*
