@@ -6,6 +6,7 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 class ZoneType(Enum):
     """Enumeration of possible zone types for hubs and areas."""
+
     RESTRICTED = "restricted"
     NORMAL = "normal"
     PRIORITY = "priority"
@@ -20,6 +21,7 @@ class ZoneMetadatas(BaseModel):
         color: The display color name for rendering.
         max_drones: Maximum number of drones that can be present.
     """
+
     zone: ZoneType = ZoneType.NORMAL
     color: str = "white"
     max_drones: Annotated[int, Field(gt=0)] = 1
@@ -29,6 +31,7 @@ class ZoneMetadatas(BaseModel):
 
 class ConnectionMetadatas(BaseModel):
     """Metadata for a connection such as its maximum capacity."""
+
     max_link_capacity: Annotated[int, Field(gt=0)] = 1
 
     model_config = ConfigDict(extra="forbid")
@@ -43,6 +46,7 @@ class Zone(BaseModel):
         y: Y coordinate (int).
         metadatas: Additional `ZoneMetadatas` for the hub.
     """
+
     name: Annotated[str, Field(pattern=r"^[^-]+$")]
     x: int
     y: int
@@ -54,6 +58,7 @@ class Connection(BaseModel):
 
     Validates that `start_name` and `end_name` are not identical.
     """
+
     start_name: str
     end_name: str
     metadatas: ConnectionMetadatas
@@ -79,6 +84,7 @@ class FlyinConfig(BaseModel):
     hubs, and bidirectional connections between hubs. It also
     performs validators to inject defaults and ensure consistency.
     """
+
     nb_drones: Annotated[int, Field(gt=0, lt=200)]
     start_hub: Zone
     end_hub: Zone

@@ -1,14 +1,15 @@
-
 from collections import deque
 from typing import cast
 import pyray as pr
 from fly_in.factories.graph_factory import build_graph
 from fly_in.factories.restrictions_factory import (
-    build_connections, build_restrictions
+    build_connections,
+    build_restrictions,
 )
 from fly_in.models.world import WorldModel
 from fly_in.parsing.schemas import FlyinConfig
 from fly_in.services.pathfinder import PathFinder, Position
+from fly_in.view.tui_output import print_output
 
 
 def get_pr_color(color: str) -> pr.Color:
@@ -102,6 +103,7 @@ def build_world(config: FlyinConfig, solver: type[PathFinder]) -> WorldModel:
     )
 
     count = 0
+    positions_list = []
     for i in range(config.nb_drones):
         path = []
         solved = algo.solve()
@@ -110,6 +112,8 @@ def build_world(config: FlyinConfig, solver: type[PathFinder]) -> WorldModel:
             raise Exception("Path not found, please retry with a valid map")
         for position in solved:
             path.append(pr.Vector3(position.x * SCALE, 0, position.y * SCALE))
+
+        positions_list.append(solved)
 
         if len(path) > count:
             count = len(path)
@@ -120,10 +124,11 @@ def build_world(config: FlyinConfig, solver: type[PathFinder]) -> WorldModel:
                 config.start_hub.x * SCALE, 3, config.start_hub.y * SCALE
             ),
         )
+
         algo.reset()
 
-    model.add_hud_text(
-        f"Total cost: {count}", 10, 30, 30, pr.BLACK
-    )
+    print_output(positions_list, config.start_hub.name)
+
+    model.add_hud_text(f"Total cost: {count}", 10, 30, 30, pr.BLACK)
 
     return model

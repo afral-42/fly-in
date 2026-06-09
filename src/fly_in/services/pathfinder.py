@@ -15,6 +15,7 @@ class Position:
         is_blocked: Whether this position is blocked and should be
             ignored when building graphs and routing.
     """
+
     def __init__(
         self,
         x: float,
@@ -61,6 +62,7 @@ class PathFinder(ABC):
     Subclasses should implement an algorithm that can compute a time
     expanded path given hub and connection capacity constraints.
     """
+
     @abstractmethod
     def __init__(
         self,

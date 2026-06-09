@@ -1,4 +1,3 @@
-
 from fly_in.parsing.schemas import FlyinConfig, ZoneType
 from fly_in.services.pathfinder import Position
 

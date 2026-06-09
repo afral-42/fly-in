@@ -8,7 +8,7 @@ class HudTextModel:
         position_x: int,
         position_y: int,
         font_size: int,
-        color: pr.Color
+        color: pr.Color,
     ) -> None:
         """Data container for HUD (2D overlay) text entries.
 

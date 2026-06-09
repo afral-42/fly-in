@@ -6,6 +6,7 @@ from enum import Enum, auto
 
 class DroneState(Enum):
     """Enumeration of possible drone animation states."""
+
     PARKED = auto()
     TRANSIT = auto()
 

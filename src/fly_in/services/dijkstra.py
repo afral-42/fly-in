@@ -10,6 +10,7 @@ class ReservedDijkstra(PathFinder):
     paths while tracking reservations per-turn for hubs and
     connections to enforce capacity constraints.
     """
+
     def __init__(
         self,
         graph: dict[Position, list[Position]],

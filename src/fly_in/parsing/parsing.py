@@ -13,6 +13,7 @@ class ParsingError(Exception):
         details: A human-readable message describing the error.
         line: Optional line number where the error occurred.
     """
+
     def __init__(self, details: str, line: int | None = None) -> None:
         prefix = (
             f"Parsing error on line {line}:\n"
@@ -24,6 +25,7 @@ class ParsingError(Exception):
 
 class ConfigKey(Enum):
     """Enumeration of valid configuration keys in the map files."""
+
     NB_DRONES = "nb_drones"
     HUB = "hub"
     START_HUB = "start_hub"
@@ -37,6 +39,7 @@ class ConfigParser:
     This class reads a configuration file, validates its syntax and
     converts it into a structure suitable for `FlyinConfig` creation.
     """
+
     EXTRACT_METADATAS = re.compile(r"\[([^\[\]]*)\]")
     METADATA_POSITION = re.compile(r"\[[^\[\]]*\]")
 

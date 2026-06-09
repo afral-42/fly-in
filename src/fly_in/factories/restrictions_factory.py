@@ -1,11 +1,9 @@
-
 from fly_in.parsing.schemas import FlyinConfig
 from fly_in.services.pathfinder import Position
 
 
 def build_restrictions(
-    graph: dict[Position, list[Position]],
-    config: FlyinConfig
+    graph: dict[Position, list[Position]], config: FlyinConfig
 ) -> dict[Position, int]:
     """Build hub restrictions mapping from configuration.
 

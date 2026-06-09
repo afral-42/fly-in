@@ -5,7 +5,7 @@ import pyray as pr
 from fly_in.controllers.controller import WorldController
 from fly_in.factories.world_factory import build_world
 from fly_in.parsing.arguments import get_map_path
-from fly_in.parsing.parsing import ConfigParser, ParsingError
+from fly_in.parsing.parsing import ConfigParser
 from fly_in.services.dijkstra import ReservedDijkstra
 from fly_in.view.world import WorldView
 
@@ -23,6 +23,7 @@ def main() -> None:
         parser = ConfigParser(map_path)
         config = parser.parse()
 
+        pr.set_trace_log_level(pr.TraceLogLevel.LOG_NONE)
         pr.set_config_flags(pr.ConfigFlags.FLAG_MSAA_4X_HINT)
         pr.init_window(1080, 720, "Fly-in")
         pr.set_target_fps(60)

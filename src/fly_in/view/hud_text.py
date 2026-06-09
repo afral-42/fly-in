@@ -18,5 +18,5 @@ class HudTextView:
             text_model.position_x,
             text_model.position_y,
             text_model.font_size,
-            text_model.color
+            text_model.color,
         )
