@@ -23,9 +23,14 @@ def main() -> None:
         parser = ConfigParser(map_path)
         config = parser.parse()
 
+        flags = (pr.ConfigFlags.FLAG_MSAA_4X_HINT)
+        monitor = pr.get_current_monitor()
+        screen_width = pr.get_monitor_width(monitor)
+        screen_height = pr.get_monitor_height(monitor)
+
+        pr.set_config_flags(flags)
         pr.set_trace_log_level(pr.TraceLogLevel.LOG_NONE)
-        pr.set_config_flags(pr.ConfigFlags.FLAG_MSAA_4X_HINT)
-        pr.init_window(1080, 720, "Fly-in")
+        pr.init_window(screen_width, screen_height, "Fly-in - @abounoua")
         pr.set_target_fps(60)
 
         model = build_world(config, ReservedDijkstra)
