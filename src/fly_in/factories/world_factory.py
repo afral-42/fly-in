@@ -2,20 +2,46 @@
 from collections import deque
 from typing import cast
 import pyray as pr
-
 from fly_in.factories.graph_factory import build_graph
-from fly_in.factories.restrictions_factory import build_connections, build_restrictions
+from fly_in.factories.restrictions_factory import (
+    build_connections, build_restrictions
+)
 from fly_in.models.world import WorldModel
 from fly_in.parsing.schemas import FlyinConfig
-from fly_in.services.dijkstra import Position
-from fly_in.services.pathfinder import PathFinder
+from fly_in.services.pathfinder import PathFinder, Position
 
 
 def get_pr_color(color: str) -> pr.Color:
+    """Convert a color name to a pyray `Color` object.
+
+    Args:
+        color: Name of the color (case-insensitive) corresponding to
+            an attribute on the `pyray` module (e.g., "white").
+
+    Returns:
+        The `pyray.Color` value for the requested color.
+    """
+
     return cast(pr.Color, getattr(pr, color.upper()))
 
 
 def build_world(config: FlyinConfig, solver: type[PathFinder]) -> WorldModel:
+    """Construct a `WorldModel` from a `FlyinConfig` and pathfinder.
+
+    This builds hubs, connections, text annotations and drone paths
+    according to the provided configuration. It uses the provided
+    `solver` class (a subclass of `PathFinder`) to compute routes for
+    each drone and applies capacity/restriction rules when building
+    the world model.
+
+    Args:
+        config: The validated `FlyinConfig` describing the map.
+        solver: A `PathFinder` subclass used to compute drone paths.
+
+    Returns:
+        A populated `WorldModel` ready for rendering and simulation.
+    """
+
     model = WorldModel()
 
     SCALE = 12.0

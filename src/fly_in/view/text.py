@@ -6,6 +6,11 @@ _MATERIAL_MAP_DIFFUSE = 0
 
 class TextView:
     def __init__(self, font_model: pr.Font) -> None:
+        """View that renders `TextModel` instances into textured planes.
+
+        Args:
+            font_model: Loaded `pyray.Font` used to rasterize text.
+        """
         self.model = font_model
         self.cache: dict[
             tuple[str, pr.Color | None, pr.Color, float], pr.Model
@@ -14,6 +19,7 @@ class TextView:
     def _cache_key(
         self, text_model: TextModel
     ) -> tuple[str, pr.Color | None, pr.Color, float]:
+        """Return a hashable cache key for the provided `TextModel`."""
         return (
             text_model.text,
             text_model.background_color,
@@ -22,6 +28,11 @@ class TextView:
         )
 
     def render(self, text_model: TextModel) -> None:
+        """Render or reuse a cached textured model for `text_model`.
+
+        Args:
+            text_model: The `TextModel` to render in the 3D scene.
+        """
         cache_key = self._cache_key(text_model)
         if cache_key in self.cache:
             pr.draw_model(

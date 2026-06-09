@@ -5,16 +5,28 @@ from fly_in.view.world import WorldView
 
 
 class ControllerError(Exception):
-    pass
+    """Generic controller-related exception."""
 
 
 class WorldController:
     def __init__(self, view: WorldView, model: WorldModel) -> None:
+        """Controller managing the main simulation loop.
+
+        Args:
+            view: The `WorldView` responsible for rendering.
+            model: The `WorldModel` containing simulation state.
+        """
         self.view = view
         self.model = model
         self.animation = False
 
     def loop(self) -> None:
+        """Run the main event and render loop until the window closes.
+
+        Handles input for camera movement, animation toggles and
+        simulation speed, updates the model state and triggers
+        rendering each frame.
+        """
         while not pr.window_should_close():
             if pr.is_key_pressed(pr.KeyboardKey.KEY_SPACE):
                 self.animation = not self.animation

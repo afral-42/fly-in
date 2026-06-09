@@ -16,6 +16,11 @@ from fly_in.view.text import TextView
 
 class WorldView:
     def __init__(self) -> None:
+        """Visual wrapper managing rendering resources and views.
+
+        Creates sub-views for drones, hubs, connections and text and
+        loads necessary assets when entering the context manager.
+        """
         self.camera = Camera(
             up=pr.Vector3(0.0, 1.0, 0.0),
             fov=45.0,
@@ -33,6 +38,12 @@ class WorldView:
         )
 
     def __enter__(self) -> Self:
+        """Context manager entry: load assets and initialize views.
+
+        Returns:
+            The `WorldView` instance ready to be used in a `with`
+            statement.
+        """
         self.drone_model = pr.load_model(self.model_path)
         self.drone_view = DroneView(self.drone_model)
         self.font_model = pr.load_font_ex(self.font_path, 96, None, 0)
@@ -49,9 +60,15 @@ class WorldView:
         exc_val: BaseException | None,
         exc_tb: TracebackType | None,
     ) -> None:
+        """Context manager exit: release loaded model resources."""
         pr.unload_model(self.drone_model)
 
     def center_camera(self, world_model: WorldModel) -> None:
+        """Center camera to focus on the extent of `world_model`.
+
+        Adjusts camera position and target based on the bounding box
+        of hubs contained in the `WorldModel`.
+        """
         xs = [hub.position.x for hub in world_model.hubs.values()]
         ys = [hub.position.z for hub in world_model.hubs.values()]
 
@@ -74,6 +91,11 @@ class WorldView:
         )
 
     def move_camera_zqsd(self, move_z: float, move_q: float) -> None:
+        """Move the camera forward/backward and sideways.
+
+        The method uses `move_z` and `move_q` as forward and right
+        movement multipliers respectively.
+        """
         speed = 3.0
 
         dx = self.camera.camera.target.x - self.camera.camera.position.x
@@ -107,6 +129,11 @@ class WorldView:
         self.camera.camera.target.z += move_z_axis
 
     def render(self, world: WorldModel) -> None:
+        """Render the entire world frame including HUD and 3D scene.
+
+        Args:
+            world: The `WorldModel` to render.
+        """
         pr.begin_drawing()
         back_color = pr.Color(251, 240, 233, 255)
         pr.clear_background(back_color)

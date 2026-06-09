@@ -5,6 +5,7 @@ from enum import Enum, auto
 
 
 class DroneState(Enum):
+    """Enumeration of possible drone animation states."""
     PARKED = auto()
     TRANSIT = auto()
 
@@ -17,6 +18,15 @@ class DroneModel:
         speed: float = 0.2,
         size: pr.Vector3 = pr.Vector3(0.25, 0.25, 0.25),
     ) -> None:
+        """Model representing the state and behavior of a drone.
+
+        Args:
+            start_point: Initial 3D position for the drone.
+            hubs_path: Deque of `Vector3` positions that the drone will
+                visit in order.
+            speed: Movement speed per update tick.
+            size: Visual scaling vector for rendering.
+        """
         self.position = start_point
         self.hubs_path = hubs_path
         self.target = self.position
@@ -29,6 +39,10 @@ class DroneModel:
         self.parked_zone = self.position
 
     def _align_direction(self, target: pr.Vector3) -> None:
+        """Align internal orientation angle towards `target`.
+
+        Updates `self.angle` based on current position and `target`.
+        """
         dx = target.x - self.position.x
         dz = target.z - self.position.z
 
@@ -38,6 +52,11 @@ class DroneModel:
     def _get_normalized_direction(
         self, target: pr.Vector3, position: pr.Vector3
     ) -> pr.Vector3:
+        """Return the normalized vector pointing from `position` to
+        `target`.
+
+        Returns a zero vector if both points coincide.
+        """
         direction = pr.Vector3(
             target.x - position.x, target.y - position.y, target.z - position.z
         )
@@ -57,11 +76,21 @@ class DroneModel:
         return normalized_direction
 
     def prepare_takeoff(self) -> None:
+        """Prepare the drone to start moving along its path.
+
+        If the drone is parked and has any waypoints remaining, set the
+        next target and enable animation.
+        """
         if self.state == DroneState.PARKED and len(self.hubs_path) > 0:
             self.target = self.hubs_path.popleft()
             self.animation = True
 
     def update_state(self) -> None:
+        """Advance the drone position according to its animation state.
+
+        Moves the drone towards `parked_target` when animated and
+        toggles `state` between `PARKED` and `TRANSIT` as appropriate.
+        """
         if not self.animation:
             self.position = pr.Vector3(
                 self.parked_target.x, self.position.y, self.parked_target.z

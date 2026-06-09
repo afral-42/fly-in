@@ -7,9 +7,16 @@ class HubView:
     def __init__(
         self,
     ) -> None:
+        """View responsible for rendering `HubModel` instances."""
+
         pass
 
     def render(self, hub: HubModel) -> None:
+        """Draw a hub as a filled cylinder with an outline.
+
+        Args:
+            hub: The `HubModel` instance to render.
+        """
         pr.draw_cylinder(
             hub.position,
             hub.radius,

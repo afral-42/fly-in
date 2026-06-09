@@ -7,6 +7,12 @@ from fly_in.parsing.schemas import FlyinConfig
 
 
 class ParsingError(Exception):
+    """Exception raised for parsing-related errors.
+
+    Attributes:
+        details: A human-readable message describing the error.
+        line: Optional line number where the error occurred.
+    """
     def __init__(self, details: str, line: int | None = None) -> None:
         prefix = (
             f"Parsing error on line {line}:\n"
@@ -17,6 +23,7 @@ class ParsingError(Exception):
 
 
 class ConfigKey(Enum):
+    """Enumeration of valid configuration keys in the map files."""
     NB_DRONES = "nb_drones"
     HUB = "hub"
     START_HUB = "start_hub"
@@ -25,6 +32,11 @@ class ConfigKey(Enum):
 
 
 class ConfigParser:
+    """Parser for Fly-in configuration files.
+
+    This class reads a configuration file, validates its syntax and
+    converts it into a structure suitable for `FlyinConfig` creation.
+    """
     EXTRACT_METADATAS = re.compile(r"\[([^\[\]]*)\]")
     METADATA_POSITION = re.compile(r"\[[^\[\]]*\]")
 
@@ -34,6 +46,12 @@ class ConfigParser:
         self.hub_coordinates: set[tuple[str, str]] = set()
 
     def _parse_config_file(self) -> Iterator[tuple[ConfigKey, str, int]]:
+        """Yield raw parsed lines as (key, value, line).
+
+        Reads the configuration file and yields tuples containing the
+        parsed `ConfigKey`, the raw value string (including any
+        metadata), and the 1-based line number.
+        """
         try:
             with open(self.config_path, "r") as f:
                 for line, content in enumerate(f, start=1):
@@ -67,6 +85,17 @@ class ConfigParser:
             )
 
     def _extract_metadatas(self, key: ConfigKey, value: str, line: int) -> str:
+        """Extract metadata bracket contents from a config value.
+
+        Args:
+            key: The `ConfigKey` for context when raising errors.
+            value: The raw value string possibly containing metadatas.
+            line: Line number for error reporting.
+
+        Returns:
+            The metadata string found inside square brackets, or empty
+            string if none present.
+        """
         metadatas = self.EXTRACT_METADATAS.findall(value)
         if len(metadatas) == 1:
             metadata = metadatas[0]
@@ -82,11 +111,26 @@ class ConfigParser:
         return cast(str, metadata)
 
     def _extract_params(self, value: str) -> str:
+        """Return the parameter portion of a value without metadata.
+
+        Strips the metadata bracket expression from the provided value
+        string and returns the remaining parameters part.
+        """
         return self.METADATA_POSITION.sub("", value)
 
     def _parse_metadatas(
         self, raw_metadatas: str, line: int
     ) -> dict[str, str]:
+        """Parse a metadata key=value string into a dictionary.
+
+        Args:
+            raw_metadatas: The raw metadata string (space separated
+                `key=value` pairs).
+            line: Line number for error reporting.
+
+        Returns:
+            A dict mapping metadata keys to values.
+        """
         metadatas = {}
 
         for metadata in raw_metadatas.split():
@@ -108,6 +152,11 @@ class ConfigParser:
     def _parse_connection(
         self, params: str, metadatas: str, line: int
     ) -> dict[str, str | dict[str, str]]:
+        """Parse a connection line into its components.
+
+        Validates that referenced hub names exist and returns a
+        dictionary suitable for constructing a `Connection` schema.
+        """
         try:
             path = params
             start, end = path.split("-")
@@ -138,6 +187,11 @@ class ConfigParser:
     def _parse_zone(
         self, params: str, metadatas: str, key: ConfigKey, line: int
     ) -> dict[str, str | dict[str, str]]:
+        """Parse a hub/start/end zone line into its components.
+
+        Ensures hub names and coordinates are unique and returns a
+        dictionary suitable for constructing a `Zone` schema.
+        """
         try:
             name, x, y = params.split()
         except ValueError:
@@ -166,6 +220,12 @@ class ConfigParser:
         return result
 
     def parse(self) -> FlyinConfig:
+        """Parse the configuration file and return a `FlyinConfig`.
+
+        Reads the file, parses hubs, connections and metadata, and
+        validates the overall structure. Raises `ParsingError` on any
+        syntax or semantic issues.
+        """
         connections: list[dict[str, str | dict[str, str]]] = []
         hubs: list[dict[str, str | dict[str, str]]] = []
 

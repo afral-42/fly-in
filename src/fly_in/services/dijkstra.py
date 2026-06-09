@@ -4,6 +4,12 @@ from fly_in.services.pathfinder import PathFinder, Position
 
 
 class ReservedDijkstra(PathFinder):
+    """A Dijkstra-like pathfinder that reserves hub and connection slots.
+
+    This implementation extends `PathFinder` to compute time-expanded
+    paths while tracking reservations per-turn for hubs and
+    connections to enforce capacity constraints.
+    """
     def __init__(
         self,
         graph: dict[Position, list[Position]],
@@ -30,9 +36,23 @@ class ReservedDijkstra(PathFinder):
 
     @staticmethod
     def normalize_connection(connection: tuple[str, str]) -> tuple[str, str]:
+        """Normalize a connection tuple to a canonical ordering.
+
+        Args:
+            connection: A `(start, end)` tuple.
+
+        Returns:
+            A tuple with the items ordered `(min, max)` to treat
+            connections as undirected for reservation lookups.
+        """
         return min(connection), max(connection)
 
     def is_full(self, position: Position, turn: int) -> bool:
+        """Return True if the given hub `position` is full at `turn`.
+
+        Checks existing hub reservations against the configured hub
+        restrictions.
+        """
         reserved = self.hub_reservation.get((position, turn))
         restriction = self.hub_restrictions.get(position)
 
@@ -44,6 +64,13 @@ class ReservedDijkstra(PathFinder):
     def is_full_connection(
         self, position: Position, next: Position, turn: int
     ) -> bool:
+        """Return True if the connection between `position` and `next`
+        is full at the given `turn`.
+
+        The method resolves whether a flight node or a physical
+        connection should be used and checks reservations vs the
+        configured connection capacities.
+        """
         if position.is_flight_node and position.physical_connection:
             connection = self.normalize_connection(
                 position.physical_connection
@@ -64,6 +91,11 @@ class ReservedDijkstra(PathFinder):
         return reserved >= restriction
 
     def push_neighbors(self, position: Position, cost: int) -> None:
+        """Push valid neighboring positions into the priority queue.
+
+        Explores neighbor nodes for the next time step and records
+        predecessor information used later to reconstruct the path.
+        """
         next_turn = cost + 1
 
         for next in self.graph[position]:
@@ -84,6 +116,12 @@ class ReservedDijkstra(PathFinder):
             self.came_from[(position, next_turn)] = position
 
     def solve(self) -> list[Position] | None:
+        """Run the pathfinding algorithm and return a route.
+
+        Returns a list of `Position` objects representing the path
+        from `start` to `end`, or `None` if no path is found within a
+        reasonable search limit.
+        """
         heapq.heappush(self.costs, (0, self.start))
 
         while len(self.costs):
@@ -99,6 +137,11 @@ class ReservedDijkstra(PathFinder):
         return None
 
     def add_reservations(self, path: list[Position]) -> None:
+        """Add reservations for hubs and connections along `path`.
+
+        Updates internal reservation maps to mark capacity usage per
+        time-step for both hubs and traversed connections.
+        """
         path.insert(0, self.start)
         for i, pos in enumerate(path, 0):
             if (pos, i) not in self.hub_reservation:
@@ -132,10 +175,19 @@ class ReservedDijkstra(PathFinder):
         path.pop(0)
 
     def reset(self) -> None:
+        """Reset internal search state so the solver can be reused."""
         self.costs = []
         self.came_from = {}
 
     def compute_path(self, cost: int) -> list[Position]:
+        """Reconstruct the path from internal predecessor maps.
+
+        Args:
+            cost: The total cost (time steps) to reach the goal.
+
+        Returns:
+            The list of `Position` nodes representing the path.
+        """
         path: list[Position] = []
         pos = self.end
 

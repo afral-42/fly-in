@@ -1,9 +1,22 @@
 
 from fly_in.parsing.schemas import FlyinConfig, ZoneType
-from fly_in.services.dijkstra import Position
+from fly_in.services.pathfinder import Position
 
 
 def build_graph(config: FlyinConfig) -> dict[Position, list[Position]]:
+    """Build a graph of positions from a FlyinConfig.
+
+    The graph maps `Position` nodes to the list of adjacent `Position`
+    nodes. Restricted hubs are replaced by intermediate flight nodes
+    to represent no-fly zones. Blocked hubs are omitted.
+
+    Args:
+        config: Parsed `FlyinConfig` containing hubs and connections.
+
+    Returns:
+        A dictionary mapping `Position` objects to lists of neighbor
+        `Position` objects representing the connectivity of the map.
+    """
     all_hubs = config.hubs + [config.start_hub, config.end_hub]
     positions_by_name = {
         hub.name: Position(

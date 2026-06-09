@@ -11,10 +11,21 @@ class DroneView:
         self,
         model: pr.Model,
     ) -> None:
+        """View responsible for rendering drone models with simple
+        animation offsets.
+
+        Args:
+            model: Loaded `pyray.Model` used to draw each drone.
+        """
         self.model = model
         self.animation_map: dict[DroneModel, dict[str, float]] = {}
 
     def render(self, drone: DroneModel) -> None:
+        """Render a single `DroneModel` with a bobbing animation.
+
+        Args:
+            drone: The `DroneModel` instance to render.
+        """
         if drone not in self.animation_map:
             self.animation_map[drone] = {
                 "animation_phase_offset": random.uniform(0.0, math.pi * 2),
