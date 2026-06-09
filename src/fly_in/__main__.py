@@ -32,6 +32,7 @@ def main() -> None:
         pr.set_trace_log_level(pr.TraceLogLevel.LOG_NONE)
         pr.init_window(screen_width, screen_height, "Fly-in - @abounoua")
         pr.set_target_fps(60)
+        pr.toggle_fullscreen()
 
         model = build_world(config, ReservedDijkstra)
 
