@@ -33,7 +33,7 @@ In this README, we will dive into the world of Multi-Agent Path Finding (MAPF), 
 
 Clone the repository and use the provided Makefile to install all necessary dependencies via `uv`:
 ```bash
-git clone 
+git clone https://github.com/afral-42/fly-in
 cd fly-in
 
 # Install dependencies and setup the virtual environment
