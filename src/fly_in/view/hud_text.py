@@ -1,8 +1,4 @@
-
-
-
 import pyray as pr
-
 from fly_in.models.hud_text import HudTextModel
 
 

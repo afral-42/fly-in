@@ -1,7 +1,7 @@
 import re
 from collections.abc import Iterator
 from enum import Enum
-from typing import cast
+from typing import Any, cast
 
 from fly_in.parsing.schemas import FlyinConfig
 
@@ -82,7 +82,7 @@ class ConfigParser:
         return cast(str, metadata)
 
     def _extract_params(self, value: str) -> str:
-        return cast(str, self.METADATA_POSITION.sub("", value))
+        return self.METADATA_POSITION.sub("", value)
 
     def _parse_metadatas(
         self, raw_metadatas: str, line: int
@@ -169,7 +169,7 @@ class ConfigParser:
         connections: list[dict[str, str | dict[str, str]]] = []
         hubs: list[dict[str, str | dict[str, str]]] = []
 
-        config: dict[str, list[dict] | dict | str] = {
+        config: dict[str, list[dict[Any, Any]] | dict[Any, Any] | str] = {
             "hubs": hubs,
             "connections": connections,
         }

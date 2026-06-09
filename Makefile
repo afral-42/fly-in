@@ -21,7 +21,7 @@ install:
 
 .PHONY: run
 run:
-	@echo "$(BLUE)[ ᕕ( ᐛ )ᕗ ] Launching the generation engine...$(RESET)"
+	@echo "$(BLUE)[ ᕕ( ᐛ )ᕗ ] Launching the visual engine...$(RESET)"
 	@$(UV) run -m $(NAME)
 
 .PHONY: debug
